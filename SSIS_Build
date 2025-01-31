@@ -1,0 +1,43 @@
+# Définir le répertoire contenant les projets SSIS
+$ProjectDirectory = "C:\Chemin\Vers\VotreRépertoire"
+$DevenvPath = "C:\Program Files\Microsoft Visual Studio\2022\Professional\Common7\IDE\devenv.com"  # Modifier selon votre version
+
+# Vérifier si devenv.com existe
+if (-Not (Test-Path $DevenvPath)) {
+    Write-Host "Erreur : devenv.com introuvable. Vérifiez le chemin." -ForegroundColor Red
+    exit 1
+}
+
+# Vérifier si le dossier existe
+if (-Not (Test-Path $ProjectDirectory)) {
+    Write-Host "Erreur : Le répertoire spécifié n'existe pas." -ForegroundColor Red
+    exit 1
+}
+
+# Récupérer tous les fichiers de solution (.sln) dans le répertoire
+$solutions = Get-ChildItem -Path $ProjectDirectory -Filter "*.sln" -Recurse
+
+# Vérifier s'il y a des solutions SSIS à compiler
+if ($solutions.Count -eq 0) {
+    Write-Host "Aucune solution SSIS (.sln) trouvée dans le répertoire." -ForegroundColor Yellow
+    exit 0
+}
+
+# Définir la configuration (Release ou Debug)
+$Configuration = "Development"
+
+# Boucler sur chaque solution SSIS trouvée
+foreach ($solution in $solutions) {
+    Write-Host "Compilation de la solution : $($solution.FullName)"
+
+    try {
+        # Exécuter la compilation avec devenv.com
+        & $DevenvPath $solution.FullName /Build $Configuration
+
+        Write-Host "Compilation terminée pour : $($solution.FullName)" -ForegroundColor Green
+    } catch {
+        Write-Host "Erreur lors de la compilation de $($solution.FullName) : $($_.Exception.Message)" -ForegroundColor Red
+    }
+}
+
+Write-Host "Processus terminé pour toutes les solutions SSIS." -ForegroundColor Cyan
