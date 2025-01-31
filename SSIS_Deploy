@@ -1,0 +1,20 @@
+# Définir le répertoire contenant les fichiers .ispac
+$RepertoireISPAC = "C:\DeploySSIS"
+
+# Définir le serveur SSIS et le dossier de déploiement
+$ServeurSSIS = "MONSERVEUR"
+$DossierSSIS = "SSISDB\MonCatalogue\MonProjet"
+
+# Boucler sur tous les fichiers .ispac du répertoire
+Get-ChildItem -Path $RepertoireISPAC -Filter "*.ispac" | ForEach-Object {
+    $FichierISPAC = $_.FullName
+    $NomFichier = $_.Name
+
+    Write-Host "Déploiement du fichier : $NomFichier"
+
+    # Exécuter la commande de déploiement avec isdeploymentwizard.exe
+    Start-Process -NoNewWindow -Wait -FilePath "C:\Program Files (x86)\Microsoft SQL Server\140\DTS\Binn\isdeploymentwizard.exe" `
+        -ArgumentList "/Silent", "/SourceFile:$FichierISPAC", "/DestinationServer:$ServeurSSIS", "/DestinationPath:$DossierSSIS"
+
+    Write-Host "Déploiement terminé pour : $NomFichier"
+}
