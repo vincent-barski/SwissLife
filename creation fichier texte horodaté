@@ -1,0 +1,18 @@
+# Définir le répertoire de destination
+$cheminDossier = "C:\Temp"
+
+# Vérifier si le dossier existe, sinon le créer
+if (-Not (Test-Path $cheminDossier)) {
+    New-Item -ItemType Directory -Path $cheminDossier | Out-Null
+}
+
+# Générer un nom de fichier avec horodatage (format YYYYMMDD_HHMMSS)
+$dateHorodatage = Get-Date -Format "yyyyMMdd_HHmmss"
+$nomFichier = "Fichier_$dateHorodatage.txt"
+$cheminFichier = Join-Path -Path $cheminDossier -ChildPath $nomFichier
+
+# Créer le fichier et y écrire un texte initial
+"Fichier créé le $((Get-Date).ToString("dd/MM/yyyy HH:mm:ss"))" | Out-File -FilePath $cheminFichier -Encoding UTF8
+
+# Afficher le chemin du fichier créé
+Write-Host "Fichier créé : $cheminFichier" -ForegroundColor Green
